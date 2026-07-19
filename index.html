@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="color-scheme" content="light only">
+<meta name="theme-color" content="#FAF8F4">
+<title>Đà Nẵng · Hội An — 29/7 → 3/8</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    color-scheme: light only;
+    --bg:#FAF8F4;
+    --surface:#FFFFFF;
+    --border:#EAE5DB;
+    --ink:#2E2B25;
+    --muted:#948C7C;
+    --amber:#C98A3E;
+    --amber-soft:#F3E4CC;
+    --coral:#C97A63;
+    --coral-soft:#F3E1DA;
+    --teal:#5E8A85;
+    --teal-soft:#DEEBE9;
+    --sage:#6E9370;
+    --sage-soft:#E1EBE0;
+    --shadow: 0 1px 2px rgba(46,43,37,0.04), 0 4px 14px rgba(46,43,37,0.05);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Be Vietnam Pro', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    padding-bottom:88px;
+  }
+  h1,h2,h3,.display{font-family:'Fraunces', serif;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .wrap{max-width:520px;margin:0 auto;padding:0 16px;}
+
+  /* ---------- Header / ticket ---------- */
+  header.top{padding:22px 16px 8px;}
+  .eyebrow{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--amber);font-weight:700;}
+  .trip-title{font-size:27px;font-weight:600;margin:4px 0 2px;line-height:1.15;}
+  .trip-sub{color:var(--muted);font-size:13px;margin-bottom:16px;}
+
+  .ticket{
+    position:relative;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:16px 18px;
+    box-shadow:var(--shadow);
+    margin-top:10px;
+  }
+  .ticket-row{display:flex;align-items:center;justify-content:space-between;}
+  .ticket-city{font-family:'Fraunces',serif;font-weight:700;font-size:21px;color:var(--ink);}
+  .ticket-city small{display:block;font-family:'Be Vietnam Pro',sans-serif;font-weight:500;font-size:10.5px;color:var(--muted);letter-spacing:.05em;}
+  .plane{color:var(--amber);font-size:13px;flex:1;text-align:center;}
+  .plane .line{height:1px;background:repeating-linear-gradient(90deg,var(--border) 0 4px, transparent 4px 8px);margin:6px 4px 0;}
+  .ticket-divider{border-top:1.5px dashed var(--border);margin:14px -18px;position:relative;}
+  .ticket-divider::before,.ticket-divider::after{content:"";position:absolute;top:-9px;width:18px;height:18px;border-radius:50%;background:var(--bg);}
+  .ticket-divider::before{left:-9px;}
+  .ticket-divider::after{right:-9px;}
+  .ticket-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);}
+  .ticket-meta b{color:var(--ink);font-weight:600;display:block;font-size:14px;margin-top:2px;}
+  .ticket-price{margin-top:10px;font-size:11.5px;color:var(--muted);text-align:right;}
+  .ticket-price b{color:var(--amber);font-family:'IBM Plex Mono',monospace;font-weight:500;}
+
+  .save-note{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);margin-top:10px;padding-left:2px;}
+  .save-note svg{flex:0 0 auto;}
+  .save-note.saving{color:var(--sage);}
+
+  /* ---------- Tabs content ---------- */
+  main{padding-top:18px;}
+  .panel{display:none;}
+  .panel.active{display:block;animation:fade .2s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+
+  .day-chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 16px;scrollbar-width:none;}
+  .day-chips::-webkit-scrollbar{display:none;}
+  .chip{
+    flex:0 0 auto;padding:9px 14px;border-radius:999px;border:1px solid var(--border);
+    background:var(--surface);color:var(--muted);font-size:12.5px;font-weight:600;
+    cursor:pointer;white-space:nowrap;transition:.15s;
+  }
+  .chip .d{display:block;font-size:9.5px;font-weight:500;letter-spacing:.04em;opacity:.75;}
+  .chip.active{background:var(--amber);color:#fff;border-color:var(--amber);}
+
+  .day-head{margin-bottom:14px;}
+  .day-head h2{font-size:19px;margin:0 0 3px;font-weight:600;}
+  .day-head span{color:var(--muted);font-size:12.5px;}
+
+  /* Timeline */
+  .timeline{position:relative;padding-left:20px;}
+  .timeline::before{content:"";position:absolute;left:5px;top:6px;bottom:6px;width:1.5px;background:var(--border);}
+  .ev{position:relative;padding-bottom:16px;}
+  .ev:last-child{padding-bottom:2px;}
+  .ev::before{content:"";position:absolute;left:-20px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 0 3px var(--bg);}
+  .ev.flight::before{background:var(--teal);}
+  .ev.done::before{background:var(--sage);}
+  .ev-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 13px;box-shadow:var(--shadow);transition:background .2s,border-color .2s;}
+  .ev.done .ev-card{background:var(--sage-soft);border-color:var(--sage);}
+  .ev-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .ev-time-row{display:flex;align-items:center;gap:8px;}
+  .ev-time{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--amber);font-weight:500;}
+  .visited-tag{display:none;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--sage);letter-spacing:.02em;}
+  .visited-tag svg{width:11px;height:11px;stroke:var(--sage);stroke-width:3;}
+  .ev.done .visited-tag{display:inline-flex;}
+  .ev-title{font-size:14.5px;font-weight:600;margin:2px 0 2px;line-height:1.35;outline:none;}
+  .ev-note{font-size:12px;color:var(--muted);line-height:1.4;outline:none;}
+  .ev-cost{display:inline-block;margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--amber);background:var(--amber-soft);padding:2px 8px;border-radius:6px;}
+  .map-btn{
+    flex:0 0 auto;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    background:var(--teal-soft);color:var(--teal);text-decoration:none;
+  }
+  .map-btn svg{width:15px;height:15px;stroke:var(--teal);}
+  .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+  .title-row .ev-title{flex:1;}
+
+  .check{
+    flex:0 0 auto;width:21px;height:21px;border-radius:7px;border:1.5px solid var(--border);
+    background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;
+  }
+  .check.on{background:var(--sage);border-color:var(--sage);}
+  .check svg{width:13px;height:13px;opacity:0;stroke:#fff;stroke-width:3;}
+  .check.on svg{opacity:1;}
+
+  .spend-row{display:flex;align-items:center;gap:6px;margin-top:8px;}
+  .spend-row label{font-size:11px;color:var(--muted);flex:0 0 auto;}
+  .spend-row input{
+    flex:1;min-width:0;border:1px solid var(--border);background:var(--bg);border-radius:8px;
+    padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink);
+  }
+  .spend-row input:focus{outline:2px solid var(--teal);outline-offset:1px;}
+  .spend-row span.unit{font-size:11px;color:var(--muted);}
+
+  .flag{display:flex;gap:7px;margin-top:8px;padding:8px 10px;background:var(--coral-soft);border-radius:9px;font-size:11.5px;color:#9C5A46;line-height:1.4;}
+  .flag svg{flex:0 0 auto;margin-top:1px;stroke:#B5654F;}
+
+  /* Food & wishlist cards */
+  .group-title{display:flex;align-items:center;gap:8px;margin:22px 0 10px;}
+  .group-title:first-child{margin-top:0;}
+  .group-title h3{font-size:12.5px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:var(--teal);margin:0;}
+  .group-title::after{content:"";flex:1;height:1px;background:var(--border);}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px 14px;margin-bottom:9px;box-shadow:var(--shadow);transition:background .2s,border-color .2s;}
+  .card.done{background:var(--sage-soft);border-color:var(--sage);}
+  .card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+  .card-name-row{display:flex;align-items:center;gap:6px;flex:1;min-width:0;}
+  .card-name{font-weight:600;font-size:14px;outline:none;flex:1;min-width:0;}
+  .card-price{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--amber);white-space:nowrap;margin-top:2px;}
+  .card-addr{font-size:11.5px;color:var(--muted);margin-top:3px;}
+  .card-hours{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);margin-top:5px;display:inline-block;}
+  .card-note{font-size:11.5px;color:var(--coral);margin-top:5px;line-height:1.4;outline:none;}
+  .badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.03em;padding:2px 7px;border-radius:5px;background:var(--sage-soft);color:var(--sage);margin-left:6px;vertical-align:middle;}
+  .card.done .badge{background:#fff;}
+  .card .visited-tag{display:none;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--sage);flex:0 0 auto;}
+  .card .visited-tag svg{width:11px;height:11px;stroke:var(--sage);stroke-width:3;}
+  .card.done .visited-tag{display:inline-flex;}
+
+  .delete-btn{flex:0 0 auto;width:24px;height:24px;border:none;background:var(--bg);color:var(--muted);display:flex;align-items:center;justify-content:center;border-radius:7px;cursor:pointer;}
+  .delete-btn svg{width:13px;height:13px;stroke:currentColor;}
+  .delete-btn:active{background:var(--coral-soft);color:var(--coral);}
+  .ev-top .delete-btn{margin-top:2px;}
+
+  .add-btn{
+    width:100%;padding:12px;margin-top:6px;border:1.5px dashed var(--border);border-radius:12px;
+    background:transparent;color:var(--muted);font-family:'Be Vietnam Pro',sans-serif;font-weight:600;
+    font-size:13px;cursor:pointer;
+  }
+  .add-btn:active{background:var(--amber-soft);border-color:var(--amber);color:var(--amber);}
+
+  /* Budget */
+  .budget-summary{display:flex;gap:10px;margin-bottom:12px;}
+  .stat{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:12px 14px;box-shadow:var(--shadow);}
+  .stat .l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:600;}
+  .stat .v{font-family:'IBM Plex Mono',monospace;font-size:16px;margin-top:4px;color:var(--ink);}
+  .stat.spent .v{color:var(--sage);}
+
+  .budget-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--shadow);}
+  .budget-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;border-bottom:1px solid var(--border);}
+  .budget-row:last-child{border-bottom:none;}
+  .budget-row .amt{font-family:'IBM Plex Mono',monospace;color:var(--ink);}
+  .budget-row.sub{padding-left:12px;color:var(--muted);font-size:12px;}
+  .budget-row.sub .amt{color:var(--muted);}
+  .budget-total{display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:14px;border-top:1.5px dashed var(--border);}
+  .budget-total .label{font-family:'Fraunces',serif;font-size:15px;font-weight:600;}
+  .budget-total .amt{font-family:'IBM Plex Mono',monospace;font-size:17px;color:var(--amber);font-weight:500;}
+  .budget-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;}
+
+  /* Bottom nav */
+  nav.bottom{
+    position:fixed;bottom:0;left:0;right:0;
+    background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);
+    border-top:1px solid var(--border);
+    display:flex;justify-content:space-around;padding:9px 6px calc(9px + env(safe-area-inset-bottom));
+    z-index:10;
+  }
+  .nav-btn{background:none;border:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Be Vietnam Pro',sans-serif;font-size:9.5px;font-weight:600;cursor:pointer;padding:4px 6px;border-radius:10px;}
+  .nav-btn.active{color:var(--amber);}
+  .nav-btn svg{width:19px;height:19px;}
+
+  @media (prefers-reduced-motion: reduce){.panel.active{animation:none;}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="eyebrow">Chuyến đi · 6 ngày 5 đêm</div>
+    <h1 class="trip-title">Đà Nẵng — Hội An</h1>
+    <div class="trip-sub">Nguyễn Hữu Hoàng Phong &amp; Phạm Hồng Nhung · 29/7 → 3/8</div>
+    <div class="save-note" id="saveNote">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+      <span id="saveNoteText">Chạm ô vuông để đánh dấu đã đi, sửa trực tiếp vào chữ, nhập số tiền đã chi — tự lưu lại.</span>
+    </div>
+  </header>
+
+  <main class="wrap" style="padding-left:0;padding-right:0;">
+    <div class="wrap">
+
+    <section id="panel-itinerary" class="panel active">
+      <div class="day-chips" id="dayChips"></div>
+      <div id="dayContent"></div>
+    </section>
+
+    <section id="panel-food" class="panel">
+      <div class="group-title"><h3>Hội An</h3></div>
+      <div id="foodHoiAn"></div>
+      <div class="group-title"><h3>Đà Nẵng</h3></div>
+      <div id="foodDaNang"></div>
+    </section>
+
+    <section id="panel-wishlist" class="panel">
+      <div class="group-title"><h3>Hội An</h3></div>
+      <div id="wishHoiAn"></div>
+      <div class="group-title"><h3>Đà Nẵng</h3></div>
+      <div id="wishDaNang"></div>
+    </section>
+
+    <section id="panel-flight" class="panel">
+      <div class="group-title"><h3>Chặng đi</h3></div>
+      <div class="ticket">
+        <div class="ticket-row">
+          <div class="ticket-city">HAN<small>Hà Nội</small></div>
+          <div class="plane">✈<div class="line"></div></div>
+          <div class="ticket-city">DAD<small>Đà Nẵng</small></div>
+        </div>
+        <div class="ticket-divider"></div>
+        <div class="ticket-meta">
+          <div>Ngày bay<b>Thứ 4, 29/7</b></div>
+          <div style="text-align:right">Giờ bay<b>21:00</b></div>
+        </div>
+        <div class="ticket-price">Giá vé (ước tính) <b>2.514.000đ</b></div>
+      </div>
+
+      <div class="group-title"><h3>Chặng về</h3></div>
+      <div class="ticket">
+        <div class="ticket-row">
+          <div class="ticket-city">DAD<small>Đà Nẵng</small></div>
+          <div class="plane">✈<div class="line"></div></div>
+          <div class="ticket-city">HAN<small>Hà Nội</small></div>
+        </div>
+        <div class="ticket-divider"></div>
+        <div class="ticket-meta">
+          <div>Ngày bay<b>Thứ 2, 3/8</b></div>
+          <div style="text-align:right">Giờ bay<b>21:20</b></div>
+        </div>
+        <div class="ticket-price">Giá vé (ước tính) <b>2.600.000đ</b></div>
+      </div>
+
+      <div class="group-title"><h3>Xe thuê</h3></div>
+      <div class="card">
+        <div class="card-top">
+          <div style="flex:1;min-width:0;">
+            <div class="card-name-row">
+              <div class="card-name">VinFast VF3</div>
+            </div>
+            <div class="card-addr">Nhận xe tại sân bay DAD, 22:25 · 29/7 — Liên hệ FB Lê Hoàng Tấn</div>
+            <div class="card-addr">Trả xe: 20:00 · 3/8, trước khi ra sân bay</div>
+          </div>
+          <div class="card-price">2.000.000đ</div>
+        </div>
+        <div class="card-note" style="color:var(--muted);">Đã cọc 200.000đ</div>
+      </div>
+    </section>
+
+    <section id="panel-budget" class="panel">
+      <div class="budget-summary">
+        <div class="stat"><div class="l">Dự trù</div><div class="v" id="statEstimate">—</div></div>
+        <div class="stat spent"><div class="l">Đã chi thực tế</div><div class="v" id="statActual">0đ</div></div>
+      </div>
+      <div class="budget-card">
+        <div class="budget-row"><span>Đi lại</span><span class="amt">7.114.000đ</span></div>
+        <div class="budget-row sub"><span>Vé máy bay HAN–DAD</span><span class="amt">2.514.000đ</span></div>
+        <div class="budget-row sub"><span>Vé máy bay DAD–HAN</span><span class="amt">2.600.000đ</span></div>
+        <div class="budget-row sub"><span>Thuê xe VF3 (đã cọc 200k)</span><span class="amt">2.000.000đ</span></div>
+
+        <div class="budget-row" style="margin-top:6px;"><span>Khách sạn</span><span class="amt">1.860.000đ</span></div>
+        <div class="budget-row sub"><span>88 ngày là tới HOUSE · 29/7</span><span class="amt">300.000đ</span></div>
+        <div class="budget-row sub"><span>Langmandi Chapter · 30–31/7</span><span class="amt">910.000đ</span></div>
+        <div class="budget-row sub"><span>Ngói's House · 1/8 (đã cọc 200k)</span><span class="amt">650.000đ</span></div>
+
+        <div class="budget-row" style="margin-top:6px;"><span>Ăn uống (ước tính)</span><span class="amt">8.974.000đ</span></div>
+
+        <div class="budget-total"><span class="label">Tổng dự trù</span><span class="amt" id="totalEstimate">17.948.000đ</span></div>
+        <div class="budget-note">Ăn uống + các vé lẻ là ước tính ban đầu. Ô "Đã chi thực tế" ở trên cộng từ số tiền bạn nhập tay ở từng mục trong Lịch trình / Ăn uống / Muốn đi.</div>
+      </div>
+      <div class="flag">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
+        <span>Đêm 2/8 (sau khi về lại Đà Nẵng) chưa thấy tên/giá khách sạn trong file gốc — nên chốt thêm chỗ ở đêm đó.</span>
+      </div>
+    </section>
+
+    </div>
+  </main>
+</div>
+
+<nav class="bottom">
+  <button class="nav-btn active" data-panel="itinerary">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 3v3M16 3v3"/></svg>
+    Lịch trình
+  </button>
+  <button class="nav-btn" data-panel="food">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 3v7a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V3M6 12v9M18 3c-1.5 1-2 3-2 5 0 2 .8 3 2 3v10"/></svg>
+    Ăn uống
+  </button>
+  <button class="nav-btn" data-panel="wishlist">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-4.6-9.5-9.1C.7 8.3 2.4 4.5 6 4a5 5 0 0 1 6 2 5 5 0 0 1 6-2c3.6.5 5.3 4.3 3.5 7.9C19 16.4 12 21 12 21Z"/></svg>
+    Muốn đi
+  </button>
+  <button class="nav-btn" data-panel="flight">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.8 19.2 16 11l3.5-3.5a1.5 1.5 0 0 0-2.1-2.1L14 9 5.8 7.2a1 1 0 0 0-.94.28L4 8.4l4.5 3-2 2.2L4 13l-.7.7 3 2.5.2 3 .7-.7-.5-2.5 2.2-2 3 4.5 1-.86a1 1 0 0 0 .28-.94Z"/></svg>
+    Vé bay
+  </button>
+  <button class="nav-btn" data-panel="budget">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20M16 15h2"/></svg>
+    Ngân sách
+  </button>
+</nav>
+
+<script>
+const days = [
+  { key:'d1', label:'Ngày 1', date:'29/7 · T4', title:'Bay vào Đà Nẵng', sub:'Hạ cánh khuya, nhận xe, nghỉ ngơi',
+    events:[
+      {id:'d1-0', time:'21:00', title:'Bay HAN → DAD', flight:true},
+      {id:'d1-1', time:'22:25', title:'Hạ cánh sân bay DAD', note:'Lấy xe thuê VF3 · liên hệ FB Lê Hoàng Tấn', map:'Sân bay quốc tế Đà Nẵng'},
+      {id:'d1-2', time:'23:00', title:'Về khách sạn', note:'88 ngày là tới HOUSE', map:"88 ngày là tới HOUSE Đà Nẵng"},
+    ]},
+  { key:'d2', label:'Ngày 2', date:'30/7 · T5', title:'Đà Nẵng → Bà Nà Hills', sub:'Đổi khách sạn, cả buổi chiều trên Bà Nà',
+    events:[
+      {id:'d2-0', time:'08:30', title:'Ăn sáng — Bún chả cá bà Hờn', map:'Bún chả cá bà Hờn Đà Nẵng'},
+      {id:'d2-1', time:'10:30', title:'Trả phòng'},
+      {id:'d2-2', time:'11:00', title:'Ăn trưa — Cơm gà Lan', map:'Cơm gà Lan, 520 Trưng Nữ Vương, Đà Nẵng'},
+      {id:'d2-3', time:'12:30', title:'Đi Bà Nà Hills', flag:'Chỉ ~6.5 tiếng trên Bà Nà (12:30–19:00) — cân nhắc xuất phát sớm hơn.', map:'Bà Nà Hills'},
+      {id:'d2-4', time:'19:00', title:'Xuống cáp treo, check-in khách sạn', note:'Langmandi Chapter', map:'Langmandi Chapter Hotel Đà Nẵng'},
+      {id:'d2-5', time:'21:00', title:'Ăn tối — Quán bánh xèo nem lụi bà Ngọc', map:'Quán bánh xèo nem lụi bà Ngọc, 228 Đống Đa, Đà Nẵng'},
+      {id:'d2-6', time:'22:00', title:'Dạo phố, về nghỉ'},
+    ]},
+  { key:'d3', label:'Ngày 3', date:'31/7 · T6', title:'Sơn Trà & biển', sub:'Lặn ngắm san hô buổi sáng, cà phê + hải sản buổi tối',
+    events:[
+      {id:'d3-0', time:'07:30', title:'Lặn ngắm san hô — bán đảo Sơn Trà', map:'Bán đảo Sơn Trà Đà Nẵng'},
+      {id:'d3-1', time:'11:30', title:'Ăn trưa — Bánh tráng Donald Trung', map:'Donald Trung bánh tráng Đà Nẵng'},
+      {id:'d3-2', time:'13:00', title:'Về khách sạn'},
+      {id:'d3-3', time:'14:00', title:'Ăn vặt — Bánh mì bột lọc', map:'Bánh mì bột lọc, Bế Văn Đàn, Đà Nẵng'},
+      {id:'d3-4', time:'16:00', title:'Cà phê — Cá Chuồn Space', map:'Cá Chuồn Space Đà Nẵng'},
+      {id:'d3-5', time:'19:00', title:'Ăn tối — Hải sản Năm Đảnh', map:'Hải sản Năm Đảnh Đà Nẵng'},
+      {id:'d3-6', time:'21:00', title:'Xem cầu Rồng phun lửa', flag:'Cầu Rồng chỉ phun lửa/nước tối Thứ 7 & Chủ Nhật — 31/7 là Thứ 6, nên đổi sang tối 1/8 hoặc 2/8.', map:'Cầu Rồng Đà Nẵng'},
+      {id:'d3-7', time:'21:30', title:'Về khách sạn'},
+    ]},
+  { key:'d4', label:'Ngày 4', date:'1/8 · T7', title:'Rừng dừa → Hội An', sub:'Chuyển sang Hội An, check-in nhà mới',
+    events:[
+      {id:'d4-0', time:'07:00', title:'Check out, đi Rừng dừa Bảy Mẫu', note:'Di chuyển ~1 giờ', map:'Rừng dừa Bảy Mẫu Hội An'},
+      {id:'d4-1', time:'08:00', title:'Chơi thúng chai', cost:'140.000đ'},
+      {id:'d4-2', time:'11:00', title:'Ăn trưa — Cháo nghêu cô Gió', cost:'60.000đ', map:'Cháo nghêu cô Gió biển An Bàng Hội An'},
+      {id:'d4-3', time:'12:00', title:'Slow Cafe', note:'Tiện đường', cost:'140.000đ', map:'Slow Cafe Hội An'},
+      {id:'d4-4', time:'13:30', title:'Về Hội An, check-in', note:"Ngói's House", map:"Ngói's House Hội An"},
+      {id:'d4-5', time:'14:00', title:'Nghỉ ngơi'},
+      {id:'d4-6', time:'16:00', title:'Chụp photobooth', cost:'90.000đ', map:'Hoi An Photobooth Cây kim sợi chỉ, 679/8 Hai Bà Trưng, Hội An'},
+      {id:'d4-7', time:'17:00', title:'Dạo phố cổ, ăn ở Mót', map:'Mót Hội An'},
+      {id:'d4-8', time:'19:00', title:'Thả đèn trời', cost:'150.000đ', flag:'File gốc đánh dấu "?" ở mục này — dễ nhầm với thả đèn hoa đăng trên sông Hoài. Nên chốt rõ trước khi đi.'},
+    ]},
+  { key:'d5', label:'Ngày 5', date:'2/8 · CN', title:'Sáng ở Hội An, chiều về Đà Nẵng', sub:'Trả phòng Hội An, dạo biển An Bàng',
+    events:[
+      {id:'d5-0', time:'08:00', title:'Ăn sáng — Bánh mì Phượng', cost:'40.000đ', map:'Bánh mì Phượng, 28 Phan Chu Trinh, Hội An'},
+      {id:'d5-1', time:'09:00', title:'Every Half — cf view lúa', cost:'150.000đ', map:'Every Half Hội An'},
+      {id:'d5-2', time:'10:00', title:'Ăn Cao Lầu', cost:'80.000đ', map:'Cao Lầu Thanh, 26 Thái Phiên, Hội An'},
+      {id:'d5-3', time:'11:30', title:'Trả phòng'},
+      {id:'d5-4', time:'12:30', title:'Đi cf view biển An Bàng — The Deck House', cost:'150.000đ', map:'The Deck House Hội An'},
+      {id:'d5-5', time:'13:00', title:'Chụp ảnh'},
+      {id:'d5-6', time:'16:00', title:'Về Đà Nẵng, check-in khách sạn', flag:'Chưa có tên/giá khách sạn cho đêm này trong file gốc — nên chốt trước ngày đi.'},
+      {id:'d5-7', time:'19:00', title:'Ăn tối — Bánh Canh Cá bà Hoa', map:'Bánh Canh Cá bà Hoa, 27 Lê Hồng Phong, Đà Nẵng'},
+    ]},
+  { key:'d6', label:'Ngày 6', date:'3/8 · T2', title:'Bay về Hà Nội', sub:'Buổi sáng thong thả, chiều ra sân bay',
+    events:[
+      {id:'d6-0', time:'08:00', title:'Casa Bay', map:'Casa Bay Đà Nẵng'},
+      {id:'d6-1', time:'11:30', title:'Trả phòng'},
+      {id:'d6-2', time:'12:00', title:'Ăn trưa — Bún chả cá bà Toải', map:'Bún chả cá bà Toải, 104 Trần Cao Vân, Đà Nẵng'},
+      {id:'d6-3', time:'13:40', title:'Đi cà phê'},
+      {id:'d6-4', time:'16:40', title:'Ăn — Cơm gà bà Buội', map:'Cơm gà bà Buội, 253 Hồ Nghinh, Đà Nẵng'},
+      {id:'d6-5', time:'19:40', title:'Ra sân bay DAD', map:'Sân bay quốc tế Đà Nẵng'},
+      {id:'d6-6', time:'20:00', title:'Trả xe'},
+      {id:'d6-7', time:'20:30', title:'Qua cửa an ninh'},
+      {id:'d6-8', time:'21:20', title:'Bay DAD → HAN', flight:true},
+    ]},
+];
+
+const foodHoiAn = [
+  {id:'fh-0', name:'Cơm gà Anh Xí', addr:'47/2 Trần Hưng Đạo', hours:'12:00–21:00', price:'25k/suất', note:'Thường 6h tối đã hết'},
+  {id:'fh-1', name:'Thịt nướng cô Thu', addr:'83 Bà Triệu, Minh An', hours:'10:00–19:00'},
+  {id:'fh-2', name:'Cao Lầu Thanh', addr:'26 Thái Phiên, Minh An', hours:'7:00–17:00', price:'35–50k', note:'Nghe nói ngon nhất Hội An', top:true},
+  {id:'fh-3', name:'Bánh mì Phượng', addr:'28 Phan Chu Trinh', hours:'6:30–21:00', note:'Ngon, quá đông — 8.5/10'},
+  {id:'fh-4', name:'Bánh mì Madam Khánh', addr:'115 Trần Cao Vân', hours:'6:30–19:00', note:'Đỉnh, đông — 9.5/10', top:true},
+  {id:'fh-5', name:'Mót', hours:'8:00–22:00'},
+  {id:'fh-6', name:'Bánh ướt thịt xiên nướng cô Lợi', addr:'20A Lý Thái Tổ', hours:'14:00–20:00'},
+  {id:'fh-7', name:'Cháo nghêu cô Gió', addr:'Biển An Bàng'},
+];
+const foodDaNang = [
+  {id:'fd-0', name:'Hải Sản Mộc', price:'1tr2 / 3 người', note:'Michelin Guide — nên đi, đặt bàn trước', top:true},
+  {id:'fd-1', name:'Cơm gà bà Buội', addr:'253 Hồ Nghinh', hours:'10:30–20:30', price:'35–100k'},
+  {id:'fd-2', name:'Quán bánh xèo nem lụi bà Ngọc', addr:'228 Đống Đa', hours:'9:00–22:00', price:'40–100k', note:'Giống kiểu quán bà Trai, must try'},
+  {id:'fd-3', name:'Chợ Cồn ăn vặt'},
+  {id:'fd-4', name:'Donald Trung', addr:'Nhiều cơ sở', hours:'7:00–22:00', price:'30–110k', note:'Bánh tráng cuộn thịt heo'},
+  {id:'fd-5', name:'Bánh mì bột lọc', addr:'Dọc Bế Văn Đàn, Lê Duẩn', hours:'14:00–17:00'},
+  {id:'fd-6', name:'Bún bò bà Diệu', addr:'17 Trần Tống', hours:'14:00–20:00', price:'35–65k', note:'Michelin', top:true},
+  {id:'fd-7', name:'Bánh Canh Cá bà Hoa', addr:'27 Lê Hồng Phong', hours:'6:00–22:00', price:'25–40k', note:'Michelin', top:true},
+  {id:'fd-8', name:'Hải sản Năm Đảnh', hours:'10:00–22:00', note:'Michelin', top:true},
+  {id:'fd-9', name:'Bún chả cá bà Toải', addr:'104 Trần Cao Vân', hours:'15:30–00:00'},
+  {id:'fd-10', name:'Bún chả cá bà Hờn', hours:'6:00–20:30', note:'Michelin', top:true},
+  {id:'fd-11', name:'Cơm gà Lan', addr:'520 Trưng Nữ Vương', hours:'9:00–20:30'},
+];
+const wishHoiAn = [
+  {id:'wh-0', name:'Hoi An Photobooth — Cây kim sợi chỉ', addr:'679/8 Hai Bà Trưng', hours:'9:00–22:00'},
+  {id:'wh-1', name:'Slow Cafe', hours:'7:30–18:30', note:'Hơi xa trung tâm một xíu'},
+  {id:'wh-2', name:'Đi thuyền thả đèn hoa đăng'},
+  {id:'wh-3', name:'Chu An Cafe — Chùa Cầu', hours:'6:30–22:30', note:'Nên đi sáng sớm'},
+  {id:'wh-4', name:'Faifo Coffee', note:'View phố cổ trên cao'},
+  {id:'wh-5', name:'Rừng dừa Bảy Mẫu', price:'140k/thúng', note:'45p–1h · 8–10h sáng hoặc sau 4h chiều · vé Agoda · mặc đồ trắng'},
+  {id:'wh-6', name:'Every Half Hội An'},
+  {id:'wh-7', name:'The Deck House', note:'Cf biển'},
+  {id:'wh-8', name:'Hít Hà', note:'Cf biển'},
+  {id:'wh-9', name:'Thung Chai', note:'Cf biển, combo ăn 399k'},
+  {id:'wh-10', name:'Roving Chill House', note:'Cf lúa'},
+];
+const wishDaNang = [
+  {id:'wd-0', name:'Shilla Monogram'},
+  {id:'wd-1', name:'Casa Bay'},
+  {id:'wd-2', name:'Cá Chuồn Space'},
+  {id:'wd-3', name:'Esco Beach'},
+  {id:'wd-4', name:'Kala Kala', note:'Ok hơn Esco — cả 2 nên đi buổi chiều ngắm hoàng hôn'},
+];
+
+// ---------- persistence ----------
+let state = { visited:{}, actual:{}, text:{}, removed:{}, custom:{} };
+let storageOK = true;
+let currentDayIdx = 0;
+
+async function loadState(){
+  try{
+    const raw = localStorage.getItem('trip-edits');
+    if(raw) state = Object.assign({visited:{},actual:{},text:{},removed:{},custom:{}}, JSON.parse(raw));
+  }catch(e){ /* no saved data yet, or storage unavailable */ }
+}
+let saveTimer=null;
+function saveState(){
+  const note=document.getElementById('saveNote'), text=document.getElementById('saveNoteText');
+  note.classList.add('saving'); text.textContent='Đang lưu…';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    try{
+      localStorage.setItem('trip-edits', JSON.stringify(state));
+      text.textContent='Đã lưu.';
+    }catch(e){
+      storageOK=false;
+      text.textContent='Không lưu được trên thiết bị này.';
+    }
+    setTimeout(()=>{note.classList.remove('saving'); if(storageOK) text.textContent='Chạm ô vuông để đánh dấu đã đi, sửa trực tiếp vào chữ, nhập số tiền đã chi — tự lưu lại.';},1400);
+  },350);
+}
+
+function toNumber(str){
+  if(!str) return 0;
+  const n = parseInt(String(str).replace(/[^\d]/g,''),10);
+  return isNaN(n)?0:n;
+}
+function fmt(n){ return n.toLocaleString('vi-VN')+'đ'; }
+
+function checkSVG(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7"/></svg>`; }
+function flagSVG(){ return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>`; }
+function pinSVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`; }
+function trashSVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg>`; }
+function mapBtn(query){
+  if(!query) return '';
+  const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
+  return `<a class="map-btn" href="${url}" rel="noopener noreferrer" aria-label="Mở Google Maps">${pinSVG()}</a>`;
+}
+function deleteBtn(id, section){
+  return `<button class="delete-btn" data-delete="${id}" data-section="${section}" aria-label="Xoá mục">${trashSVG()}</button>`;
+}
+function addBtn(section, kind, dayIdx){
+  const label = kind==='event' ? '+ Thêm mục' : '+ Thêm địa điểm';
+  const dayAttr = dayIdx!==undefined ? ` data-day-idx="${dayIdx}"` : '';
+  return `<button class="add-btn" data-add="${section}" data-add-kind="${kind}"${dayAttr}>${label}</button>`;
+}
+function newId(){ return 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+function spendControls(id){
+  const visited = !!state.visited[id];
+  const actual = state.actual[id] || '';
+  return `
+    <div class="spend-row">
+      <div class="check ${visited?'on':''}" data-toggle="${id}">${checkSVG()}</div>
+      <label>Đã chi:</label>
+      <input type="text" inputmode="numeric" placeholder="0" value="${actual}" data-spend="${id}">
+      <span class="unit">đ</span>
+    </div>`;
+}
+
+function applyTextOverride(id, fallback){
+  return state.text[id] !== undefined ? state.text[id] : fallback;
+}
+
+function renderChips(){
+  const el = document.getElementById('dayChips');
+  el.innerHTML = days.map((d,i)=>`<div class="chip${i===0?' active':''}" data-idx="${i}"><span class="d">${d.date}</span>${d.label}</div>`).join('');
+  el.querySelectorAll('.chip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      el.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+      chip.classList.add('active');
+      currentDayIdx = +chip.dataset.idx;
+      renderDay(currentDayIdx);
+    });
+  });
+}
+
+function renderDay(idx){
+  currentDayIdx = idx;
+  const d = days[idx];
+  const section = 'day-'+d.key;
+  const list = d.events.filter(ev=>!state.removed[ev.id]).concat(state.custom[section]||[]);
+  const el = document.getElementById('dayContent');
+  el.innerHTML = `
+    <div class="day-head"><h2>${d.title}</h2><span>${d.sub}</span></div>
+    <div class="timeline">
+      ${list.map(ev=>eventCardHTML(ev, section)).join('')}
+    </div>
+    ${addBtn(section,'event',idx)}
+  `;
+  bindDynamic(el);
+}
+
+function eventCardHTML(ev, section){
+  const visited = !!state.visited[ev.id];
+  return `
+    <div class="ev${ev.flight?' flight':''}${visited?' done':''}">
+      <div class="ev-card">
+        <div class="ev-top">
+          <div style="flex:1;min-width:0;">
+            <div class="ev-time-row">
+              <div class="ev-time" contenteditable="true" data-text="${ev.id}-time">${applyTextOverride(ev.id+'-time', ev.time||'--:--')}</div>
+              <div class="visited-tag">${checkSVG()}Đã đi</div>
+            </div>
+            <div class="title-row">
+              <div class="ev-title" contenteditable="true" data-text="${ev.id}-title">${applyTextOverride(ev.id+'-title', ev.title||'Điểm mới — chạm để sửa')}</div>
+              ${mapBtn(ev.map)}
+            </div>
+            ${(ev.note || state.text[ev.id+'-note']!==undefined) ? `<div class="ev-note" contenteditable="true" data-text="${ev.id}-note">${applyTextOverride(ev.id+'-note', ev.note||'')}</div>` : ''}
+            ${ev.cost?`<div class="ev-cost">Dự trù: ${ev.cost}</div>`:''}
+            ${ev.flag?`<div class="flag">${flagSVG()}<span>${ev.flag}</span></div>`:''}
+          </div>
+          ${deleteBtn(ev.id, section)}
+        </div>
+        ${spendControls(ev.id)}
+      </div>
+    </div>`;
+}
+
+function foodCard(item, city, section){
+  const visited = !!state.visited[item.id];
+  const query = applyTextOverride(item.id+'-title', item.name) + (item.addr?', '+item.addr:'') + ', ' + city;
+  return `<div class="card ${visited?'done':''}">
+    <div class="card-top">
+      <div style="flex:1;min-width:0;">
+        <div class="card-name-row">
+          <div class="card-name" contenteditable="true" data-text="${item.id}-title">${applyTextOverride(item.id+'-title', item.name||'Địa điểm mới — chạm để sửa')}${item.top?'<span class="badge">Nổi bật</span>':''}</div>
+          <span class="visited-tag">${checkSVG()}Đã đi</span>
+          ${mapBtn(query)}
+        </div>
+        ${item.addr?`<div class="card-addr">${item.addr}</div>`:''}
+        ${item.hours?`<div class="card-hours">${item.hours}</div>`:''}
+        ${(item.note || state.text[item.id+'-note']!==undefined) ? `<div class="card-note" contenteditable="true" data-text="${item.id}-note">${applyTextOverride(item.id+'-note', item.note||'')}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        ${item.price?`<div class="card-price">${item.price}</div>`:''}
+        ${deleteBtn(item.id, section)}
+      </div>
+    </div>
+    ${spendControls(item.id)}
+  </div>`;
+}
+
+function renderGroup(elId, staticArr, section, city){
+  const list = staticArr.filter(i=>!state.removed[i.id]).concat(state.custom[section]||[]);
+  const el = document.getElementById(elId);
+  el.innerHTML = list.map(i=>foodCard(i,city,section)).join('') + addBtn(section,'place');
+  bindDynamic(el);
+}
+
+function renderAllGroups(){
+  renderGroup('foodHoiAn', foodHoiAn, 'food-hoian', 'Hội An');
+  renderGroup('foodDaNang', foodDaNang, 'food-danang', 'Đà Nẵng');
+  renderGroup('wishHoiAn', wishHoiAn, 'wish-hoian', 'Hội An');
+  renderGroup('wishDaNang', wishDaNang, 'wish-danang', 'Đà Nẵng');
+}
+
+function rerenderSection(section){
+  if(section.startsWith('day-')) renderDay(currentDayIdx);
+  else if(section==='food-hoian') renderGroup('foodHoiAn', foodHoiAn, section, 'Hội An');
+  else if(section==='food-danang') renderGroup('foodDaNang', foodDaNang, section, 'Đà Nẵng');
+  else if(section==='wish-hoian') renderGroup('wishHoiAn', wishHoiAn, section, 'Hội An');
+  else if(section==='wish-danang') renderGroup('wishDaNang', wishDaNang, section, 'Đà Nẵng');
+}
+
+function bindDynamic(root){
+  root.querySelectorAll('[data-toggle]').forEach(el=>{
+    el.onclick = ()=>{
+      const id = el.dataset.toggle;
+      state.visited[id] = !state.visited[id];
+      el.classList.toggle('on');
+      el.closest('.ev,.card')?.classList.toggle('done');
+      saveState();
+    };
+  });
+  root.querySelectorAll('[data-spend]').forEach(el=>{
+    el.oninput = ()=>{
+      state.actual[el.dataset.spend] = el.value;
+      updateBudgetStats();
+      saveState();
+    };
+  });
+  root.querySelectorAll('[data-text]').forEach(el=>{
+    el.addEventListener('blur', ()=>{
+      state.text[el.dataset.text] = el.innerText;
+      saveState();
+    });
+  });
+  root.querySelectorAll('[data-delete]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const id = btn.dataset.delete;
+      const section = btn.dataset.section;
+      if(!confirm('Xoá mục này khỏi kế hoạch?')) return;
+      if(id.startsWith('c')){
+        const arr = state.custom[section]||[];
+        const i = arr.findIndex(x=>x.id===id);
+        if(i>-1) arr.splice(i,1);
+      } else {
+        state.removed[id] = true;
+      }
+      saveState();
+      rerenderSection(section);
+      updateBudgetStats();
+    };
+  });
+  root.querySelectorAll('[data-add]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const section = btn.dataset.add;
+      const kind = btn.dataset.addKind;
+      if(!state.custom[section]) state.custom[section] = [];
+      const id = newId();
+      if(kind==='event'){
+        state.custom[section].push({id, time:'--:--', title:'Điểm mới — chạm để sửa', note:'Chạm để thêm ghi chú'});
+      } else {
+        state.custom[section].push({id, name:'Địa điểm mới — chạm để sửa', note:'Chạm để thêm ghi chú (địa chỉ, giờ, giá...)'});
+      }
+      saveState();
+      rerenderSection(section);
+      setTimeout(()=>{
+        const target = document.querySelector(`[data-text="${id}-title"]`);
+        if(target){
+          target.focus();
+          const range = document.createRange();
+          range.selectNodeContents(target);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      }, 30);
+    };
+  });
+}
+
+function updateBudgetStats(){
+  const total = Object.values(state.actual).reduce((sum,v)=>sum+toNumber(v),0);
+  document.getElementById('statActual').textContent = fmt(total);
+  document.getElementById('statEstimate').textContent = '17.948.000đ';
+}
+
+async function init(){
+  await loadState();
+  renderChips();
+  renderDay(0);
+  renderAllGroups();
+  updateBudgetStats();
+  if(typeof Storage === 'undefined'){
+    document.getElementById('saveNoteText').textContent = 'Trình duyệt này không hỗ trợ lưu trữ — chỉnh sửa sẽ không được giữ lại.';
+  }
+}
+init();
+
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.panel).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
