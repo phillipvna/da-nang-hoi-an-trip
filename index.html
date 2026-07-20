@@ -123,9 +123,11 @@
   .map-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
   .map-query{
     flex:1;min-width:0;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);
-    outline:none;line-height:1.4;padding:2px 0;
+    outline:none;line-height:1.4;padding:4px 8px;background:var(--teal-soft);border-radius:6px;
   }
-  .map-query:empty::before{content:attr(data-placeholder);color:var(--muted);font-style:italic;}
+  .map-query:empty::before{content:attr(data-placeholder);color:var(--teal);opacity:.7;font-style:italic;}
+  .map-query:focus{outline:2px solid var(--teal);outline-offset:1px;}
+  .map-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;margin-top:8px;margin-bottom:3px;}
   .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
   .title-row .ev-title{flex:1;}
 
@@ -308,19 +310,20 @@
         <div class="budget-row sub"><span>Vé máy bay DAD–HAN</span><span class="amt">2.600.000đ</span></div>
         <div class="budget-row sub"><span>Thuê xe VF3 (đã cọc 200k)</span><span class="amt">2.000.000đ</span></div>
 
-        <div class="budget-row" style="margin-top:6px;"><span>Khách sạn</span><span class="amt">1.860.000đ</span></div>
+        <div class="budget-row" style="margin-top:6px;"><span>Khách sạn</span><span class="amt">1.860.000đ + ?</span></div>
         <div class="budget-row sub"><span>88 ngày là tới HOUSE · 29/7</span><span class="amt">300.000đ</span></div>
         <div class="budget-row sub"><span>Langmandi Chapter · 30–31/7</span><span class="amt">910.000đ</span></div>
-        <div class="budget-row sub"><span>Ngói's House · 1/8 (đã cọc 200k)</span><span class="amt">650.000đ</span></div>
+        <div class="budget-row sub"><span>Ri's House · 1/8 (đã cọc 200k)</span><span class="amt">650.000đ</span></div>
+        <div class="budget-row sub"><span>Ngói's House · 2/8</span><span class="amt">Chưa có giá</span></div>
 
         <div class="budget-row" style="margin-top:6px;"><span>Ăn uống (ước tính)</span><span class="amt">8.974.000đ</span></div>
 
-        <div class="budget-total"><span class="label">Tổng dự trù</span><span class="amt" id="totalEstimate">17.948.000đ</span></div>
+        <div class="budget-total"><span class="label">Tổng dự trù</span><span class="amt" id="totalEstimate">17.948.000đ + ?</span></div>
         <div class="budget-note">Ăn uống + các vé lẻ là ước tính ban đầu. Ô "Đã chi thực tế" ở trên cộng từ số tiền bạn nhập tay ở từng mục trong Lịch trình / Ăn uống / Muốn đi.</div>
       </div>
       <div class="flag">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
-        <span>Đêm 2/8 (sau khi về lại Đà Nẵng) chưa thấy tên/giá khách sạn trong file gốc — nên chốt thêm chỗ ở đêm đó.</span>
+        <span>Ngói's House đêm 2/8 chưa có giá phòng — cần bổ sung để tính đúng tổng dự trù.</span>
       </div>
     </section>
 
@@ -386,27 +389,27 @@ const days = [
       {id:'d4-1', time:'08:00', title:'Chơi thúng chai', cost:'140.000đ'},
       {id:'d4-2', time:'11:00', title:'Ăn trưa — Cháo nghêu cô Gió', cost:'60.000đ', map:'Cháo nghêu cô Gió biển An Bàng Hội An'},
       {id:'d4-3', time:'12:00', title:'Slow Cafe', note:'Tiện đường', cost:'140.000đ', map:'Slow Cafe Hội An'},
-      {id:'d4-4', time:'13:30', title:'Về Hội An, check-in', note:"Ngói's House", map:"Ngói's House Hội An"},
+      {id:'d4-4', time:'13:30', title:'Về Hội An, check-in', note:"Ri's House homestay", map:"Ri's House homestay Hội An"},
       {id:'d4-5', time:'14:00', title:'Nghỉ ngơi'},
       {id:'d4-6', time:'16:00', title:'Chụp photobooth', cost:'90.000đ', map:'Hoi An Photobooth Cây kim sợi chỉ, 679/8 Hai Bà Trưng, Hội An'},
       {id:'d4-7', time:'17:00', title:'Dạo phố cổ, ăn ở Mót', map:'Mót Hội An'},
       {id:'d4-8', time:'19:00', title:'Thả đèn trời', cost:'150.000đ', flag:'File gốc đánh dấu "?" ở mục này — dễ nhầm với thả đèn hoa đăng trên sông Hoài. Nên chốt rõ trước khi đi.'},
     ]},
-  { key:'d5', label:'Ngày 5', date:'2/8 · CN', title:'Sáng ở Hội An, chiều về Đà Nẵng', sub:'Trả phòng Hội An, dạo biển An Bàng',
+  { key:'d5', label:'Ngày 5', date:'2/8 · CN', title:"Hội An — đổi homestay", sub:"Trả phòng Ri's House, dạo biển An Bàng, check-in Ngói's House",
     events:[
       {id:'d5-0', time:'08:00', title:'Ăn sáng — Bánh mì Phượng', cost:'40.000đ', map:'Bánh mì Phượng, 28 Phan Chu Trinh, Hội An'},
       {id:'d5-1', time:'09:00', title:'Every Half — cf view lúa', cost:'150.000đ', map:'Every Half Hội An'},
       {id:'d5-2', time:'10:00', title:'Ăn Cao Lầu', cost:'80.000đ', map:'Cao Lầu Thanh, 26 Thái Phiên, Hội An'},
-      {id:'d5-3', time:'11:30', title:'Trả phòng'},
+      {id:'d5-3', time:'11:30', title:'Trả phòng', note:"Ri's House"},
       {id:'d5-4', time:'12:30', title:'Đi cf view biển An Bàng — The Deck House', cost:'150.000đ', map:'The Deck House Hội An'},
       {id:'d5-5', time:'13:00', title:'Chụp ảnh'},
-      {id:'d5-6', time:'16:00', title:'Về Đà Nẵng, check-in khách sạn', flag:'Chưa có tên/giá khách sạn cho đêm này trong file gốc — nên chốt trước ngày đi.'},
-      {id:'d5-7', time:'19:00', title:'Ăn tối — Bánh Canh Cá bà Hoa', map:'Bánh Canh Cá bà Hoa, 27 Lê Hồng Phong, Đà Nẵng'},
+      {id:'d5-6', time:'16:00', title:"Check-in Ngói's House", map:"Ngói's House Hội An"},
+      {id:'d5-7', time:'19:00', title:'Ăn tối — Bánh Canh Cá bà Hoa', map:'Bánh Canh Cá bà Hoa, 27 Lê Hồng Phong, Đà Nẵng', flag:"Quán này ở Đà Nẵng — đêm 2/8 giờ ở lại Hội An nên khá xa, cân nhắc đổi sang quán ăn tối trong Hội An."},
     ]},
-  { key:'d6', label:'Ngày 6', date:'3/8 · T2', title:'Bay về Hà Nội', sub:'Buổi sáng thong thả, chiều ra sân bay',
+  { key:'d6', label:'Ngày 6', date:'3/8 · T2', title:'Bay về Hà Nội', sub:"Trả phòng Ngói's House sớm, về Đà Nẵng, chiều ra sân bay",
     events:[
+      {id:'d6-s', time:'07:00', title:"Trả phòng Ngói's House, đi Đà Nẵng", note:'Di chuyển ~45 phút', map:"Ngói's House Hội An"},
       {id:'d6-0', time:'08:00', title:'Casa Bay', map:'Casa Bay Đà Nẵng'},
-      {id:'d6-1', time:'11:30', title:'Trả phòng'},
       {id:'d6-2', time:'12:00', title:'Ăn trưa — Bún chả cá bà Toải', map:'Bún chả cá bà Toải, 104 Trần Cao Vân, Đà Nẵng'},
       {id:'d6-3', time:'13:40', title:'Đi cà phê'},
       {id:'d6-4', time:'16:40', title:'Ăn — Cơm gà bà Buội', map:'Cơm gà bà Buội, 253 Hồ Nghinh, Đà Nẵng'},
@@ -505,6 +508,7 @@ function trashSVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke-width="
 function mapRow(id, defaultQuery){
   const query = applyTextOverride(id+'-map', defaultQuery||'');
   return `
+    <div class="map-label">Địa chỉ Google Maps (sửa được)</div>
     <div class="map-row">
       <button type="button" class="map-btn" data-mapbtn="${id}" aria-label="Mở Google Maps">${pinSVG()}</button>
       <div class="map-query" contenteditable="true" data-text="${id}-map" data-placeholder="Chạm để nhập địa chỉ Google Maps">${query}</div>
