@@ -106,7 +106,8 @@
   .ev.done .ev-card{background:var(--sage-soft);border-color:var(--sage);}
   .ev-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
   .ev-time-row{display:flex;align-items:center;gap:8px;}
-  .ev-time{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--amber);font-weight:500;}
+  .ev-time{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--amber);font-weight:500;border:none;background:transparent;padding:2px 0;-webkit-appearance:none;appearance:none;}
+  .ev-time::-webkit-calendar-picker-indicator{filter:invert(66%) sepia(41%) saturate(597%) hue-rotate(347deg);opacity:.8;}
   .visited-tag{display:none;align-items:center;gap:3px;font-size:10px;font-weight:700;color:var(--sage);letter-spacing:.02em;}
   .visited-tag svg{width:11px;height:11px;stroke:var(--sage);stroke-width:3;}
   .ev.done .visited-tag{display:inline-flex;}
@@ -115,9 +116,16 @@
   .ev-cost{display:inline-block;margin-top:6px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--amber);background:var(--amber-soft);padding:2px 8px;border-radius:6px;}
   .map-btn{
     flex:0 0 auto;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;
-    background:var(--teal-soft);color:var(--teal);text-decoration:none;
+    background:var(--teal-soft);color:var(--teal);text-decoration:none;border:none;cursor:pointer;padding:0;
   }
   .map-btn svg{width:15px;height:15px;stroke:var(--teal);}
+  .map-btn:disabled{opacity:.4;cursor:default;}
+  .map-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
+  .map-query{
+    flex:1;min-width:0;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--teal);
+    outline:none;line-height:1.4;padding:2px 0;
+  }
+  .map-query:empty::before{content:attr(data-placeholder);color:var(--muted);font-style:italic;}
   .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
   .title-row .ev-title{flex:1;}
 
@@ -488,15 +496,19 @@ function toNumber(str){
   return isNaN(n)?0:n;
 }
 function fmt(n){ return n.toLocaleString('vi-VN')+'đ'; }
+function timeInputValue(t){ return /^\d{2}:\d{2}$/.test(t) ? t : ''; }
 
 function checkSVG(){ return `<svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7"/></svg>`; }
 function flagSVG(){ return `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>`; }
 function pinSVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`; }
 function trashSVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6h16Z"/></svg>`; }
-function mapBtn(query){
-  if(!query) return '';
-  const url = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(query);
-  return `<a class="map-btn" href="${url}" rel="noopener noreferrer" aria-label="Mở Google Maps">${pinSVG()}</a>`;
+function mapRow(id, defaultQuery){
+  const query = applyTextOverride(id+'-map', defaultQuery||'');
+  return `
+    <div class="map-row">
+      <button type="button" class="map-btn" data-mapbtn="${id}" aria-label="Mở Google Maps">${pinSVG()}</button>
+      <div class="map-query" contenteditable="true" data-text="${id}-map" data-placeholder="Chạm để nhập địa chỉ Google Maps">${query}</div>
+    </div>`;
 }
 function deleteBtn(id, section){
   return `<button class="delete-btn" data-delete="${id}" data-section="${section}" aria-label="Xoá mục">${trashSVG()}</button>`;
@@ -561,16 +573,16 @@ function eventCardHTML(ev, section){
         <div class="ev-top">
           <div style="flex:1;min-width:0;">
             <div class="ev-time-row">
-              <div class="ev-time" contenteditable="true" data-text="${ev.id}-time">${applyTextOverride(ev.id+'-time', ev.time||'--:--')}</div>
+              <input type="time" class="ev-time" data-time="${ev.id}" value="${timeInputValue(applyTextOverride(ev.id+'-time', ev.time||''))}">
               <div class="visited-tag">${checkSVG()}Đã đi</div>
             </div>
             <div class="title-row">
               <div class="ev-title" contenteditable="true" data-text="${ev.id}-title">${applyTextOverride(ev.id+'-title', ev.title||'Điểm mới — chạm để sửa')}</div>
-              ${mapBtn(ev.map)}
             </div>
             ${(ev.note || state.text[ev.id+'-note']!==undefined) ? `<div class="ev-note" contenteditable="true" data-text="${ev.id}-note">${applyTextOverride(ev.id+'-note', ev.note||'')}</div>` : ''}
             ${ev.cost?`<div class="ev-cost">Dự trù: ${ev.cost}</div>`:''}
             ${ev.flag?`<div class="flag">${flagSVG()}<span>${ev.flag}</span></div>`:''}
+            ${mapRow(ev.id, ev.map)}
           </div>
           ${deleteBtn(ev.id, section)}
         </div>
@@ -588,7 +600,6 @@ function foodCard(item, city, section){
         <div class="card-name-row">
           <div class="card-name" contenteditable="true" data-text="${item.id}-title">${applyTextOverride(item.id+'-title', item.name||'Địa điểm mới — chạm để sửa')}${item.top?'<span class="badge">Nổi bật</span>':''}</div>
           <span class="visited-tag">${checkSVG()}Đã đi</span>
-          ${mapBtn(query)}
         </div>
         ${item.addr?`<div class="card-addr">${item.addr}</div>`:''}
         ${item.hours?`<div class="card-hours">${item.hours}</div>`:''}
@@ -599,6 +610,7 @@ function foodCard(item, city, section){
         ${deleteBtn(item.id, section)}
       </div>
     </div>
+    ${mapRow(item.id, query)}
     ${spendControls(item.id)}
   </div>`;
 }
@@ -633,6 +645,20 @@ function bindDynamic(root){
       el.classList.toggle('on');
       el.closest('.ev,.card')?.classList.toggle('done');
       saveState();
+    };
+  });
+  root.querySelectorAll('[data-time]').forEach(el=>{
+    el.onchange = ()=>{
+      state.text[el.dataset.time+'-time'] = el.value || '--:--';
+      saveState();
+    };
+  });
+  root.querySelectorAll('[data-mapbtn]').forEach(btn=>{
+    btn.onclick = ()=>{
+      const field = root.querySelector(`[data-text="${btn.dataset.mapbtn}-map"]`);
+      const q = field ? field.innerText.trim() : '';
+      if(!q) { field?.focus(); return; }
+      window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q), '_blank', 'noopener');
     };
   });
   root.querySelectorAll('[data-spend]').forEach(el=>{
