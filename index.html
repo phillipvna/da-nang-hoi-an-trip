@@ -127,7 +127,6 @@
   }
   .map-query:empty::before{content:attr(data-placeholder);color:var(--teal);opacity:.7;font-style:italic;}
   .map-query:focus{outline:2px solid var(--teal);outline-offset:1px;}
-  .map-label{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;margin-top:8px;margin-bottom:3px;}
   .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
   .title-row .ev-title{flex:1;}
 
@@ -508,7 +507,6 @@ function trashSVG(){ return `<svg viewBox="0 0 24 24" fill="none" stroke-width="
 function mapRow(id, defaultQuery){
   const query = applyTextOverride(id+'-map', defaultQuery||'');
   return `
-    <div class="map-label">Địa chỉ Google Maps (sửa được)</div>
     <div class="map-row">
       <button type="button" class="map-btn" data-mapbtn="${id}" aria-label="Mở Google Maps">${pinSVG()}</button>
       <div class="map-query" contenteditable="true" data-text="${id}-map" data-placeholder="Chạm để nhập địa chỉ Google Maps">${query}</div>
