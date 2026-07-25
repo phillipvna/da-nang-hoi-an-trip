@@ -310,11 +310,11 @@
 
     <section id="panel-budget" class="panel">
       <div class="budget-summary">
-        <div class="stat"><div class="l">Dự trù</div><div class="v" id="statEstimate">—</div></div>
+        <div class="stat"><div class="l">Dự trù ăn uống</div><div class="v" id="statEstimate">—</div></div>
         <div class="stat spent"><div class="l">Đã chi thực tế</div><div class="v" id="statActual">0đ</div></div>
       </div>
       <div class="budget-card" id="budgetCard"></div>
-      <div class="budget-note">Chạm vào tên hoặc số tiền để sửa; để trống nghĩa là chưa có giá. Ô "Đã chi thực tế" ở trên cộng từ số tiền bạn nhập tay ở từng mục trong Lịch trình / Ăn uống / Muốn đi.</div>
+      <div class="budget-note">Đi lại và Khách sạn tính là "Đã chi thực tế" (đã đặt/đã trả). "Dự trù ăn uống" chỉ còn tính phần ăn uống ước tính, cộng thêm số tiền bạn nhập tay ở từng mục trong Lịch trình / Ăn uống / Muốn đi vẫn nằm trong "Đã chi thực tế". Chạm vào tên hoặc số tiền để sửa; để trống nghĩa là chưa có giá.</div>
     </section>
 
     </div>
@@ -456,21 +456,22 @@ const wishDaNang = [
 ];
 
 const budgetCategories = [
-  { id:'travel', label:'Đi lại', items:[
+  { id:'travel', group:'actual', label:'Đi lại', items:[
     {id:'bg-flight1', label:'Vé máy bay HAN–DAD', amount:2514000},
     {id:'bg-flight2', label:'Vé máy bay DAD–HAN', amount:2600000},
     {id:'bg-car', label:'Thuê xe VF3 (đã cọc 200k)', amount:2000000},
   ]},
-  { id:'hotel', label:'Khách sạn', items:[
+  { id:'hotel', group:'actual', label:'Khách sạn', items:[
     {id:'bg-h1', label:'88 ngày là tới HOUSE · 29/7', amount:300000},
     {id:'bg-h2', label:'Langmandi Chapter · 30–31/7', amount:910000},
     {id:'bg-h3', label:"Ri's House · 1/8 (đã cọc 200k)", amount:650000},
     {id:'bg-h4', label:"Ngói's House · 2/8", amount:0},
   ]},
-  { id:'food', label:'Ăn uống (ước tính)', items:[
+  { id:'food', group:'estimate', label:'Ăn uống (ước tính)', items:[
     {id:'bg-food1', label:'Ước tính chung cho cả chuyến', amount:8974000},
   ]},
 ];
+const budgetGroupLabels = { actual:'Đã chi thực tế', estimate:'Dự trù (ước tính)' };
 
 // ---------- persistence ----------
 let state = { visited:{}, actual:{}, text:{}, removed:{}, custom:{} };
@@ -656,31 +657,42 @@ function budgetCategoryList(cat){
 
 function renderBudget(){
   const el = document.getElementById('budgetCard');
+  let lastGroup = null;
   const html = budgetCategories.map(cat=>{
     const list = budgetCategoryList(cat);
+    const heading = cat.group!==lastGroup ? `<div class="group-title"><h3>${budgetGroupLabels[cat.group]}</h3></div>` : '';
+    lastGroup = cat.group;
     return `
+      ${heading}
       <div class="budget-row" style="margin-top:6px;"><span>${cat.label}</span><span class="amt" id="cat-${cat.id}-subtotal">0đ</span></div>
       ${list.map(i=>budgetItemRow(i, 'budget-'+cat.id)).join('')}
       <div class="budget-add-row">${addBtn('budget-'+cat.id, 'budgetitem')}</div>
     `;
   }).join('');
-  el.innerHTML = html + `<div class="budget-total"><span class="label">Tổng dự trù</span><span class="amt" id="totalEstimate">0đ</span></div>`;
+  el.innerHTML = html + `<div class="budget-total"><span class="label">Tổng chi phí chuyến đi</span><span class="amt" id="totalEstimate">0đ</span></div>`;
   bindDynamic(el);
-  updateBudgetTotals();
+  updateBudgetStats();
 }
 
-function updateBudgetTotals(){
-  let grand = 0;
+function updateBudgetStats(){
+  let actualFromBudget = 0;
+  let estimateFromBudget = 0;
   budgetCategories.forEach(cat=>{
     const subtotal = budgetCategoryList(cat).reduce((sum,i)=>sum+budgetAmount(i.id, i.amount), 0);
-    grand += subtotal;
+    if(cat.group==='estimate') estimateFromBudget += subtotal; else actualFromBudget += subtotal;
     const subEl = document.getElementById(`cat-${cat.id}-subtotal`);
     if(subEl) subEl.textContent = fmt(subtotal);
   });
+  const manualActual = Object.values(state.actual).reduce((sum,v)=>sum+toNumber(v),0);
+  const totalActual = actualFromBudget + manualActual;
+  const grand = totalActual + estimateFromBudget;
+
+  const statEstimateEl = document.getElementById('statEstimate');
+  if(statEstimateEl) statEstimateEl.textContent = fmt(estimateFromBudget);
+  const statActualEl = document.getElementById('statActual');
+  if(statActualEl) statActualEl.textContent = fmt(totalActual);
   const totalEl = document.getElementById('totalEstimate');
   if(totalEl) totalEl.textContent = fmt(grand);
-  const statEl = document.getElementById('statEstimate');
-  if(statEl) statEl.textContent = fmt(grand);
 }
 
 function renderAllGroups(){
@@ -733,7 +745,7 @@ function bindDynamic(root){
   root.querySelectorAll('[data-budgetamt]').forEach(el=>{
     el.oninput = ()=>{
       state.text[el.dataset.budgetamt+'-amount'] = el.value;
-      updateBudgetTotals();
+      updateBudgetStats();
       saveState();
     };
   });
@@ -788,11 +800,6 @@ function bindDynamic(root){
       }, 30);
     };
   });
-}
-
-function updateBudgetStats(){
-  const total = Object.values(state.actual).reduce((sum,v)=>sum+toNumber(v),0);
-  document.getElementById('statActual').textContent = fmt(total);
 }
 
 async function init(){
