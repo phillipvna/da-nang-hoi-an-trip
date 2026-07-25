@@ -194,8 +194,18 @@
   .budget-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;font-size:13px;border-bottom:1px solid var(--border);}
   .budget-row:last-child{border-bottom:none;}
   .budget-row .amt{font-family:'IBM Plex Mono',monospace;color:var(--ink);}
-  .budget-row.sub{padding-left:12px;color:var(--muted);font-size:12px;}
+  .budget-row.sub{padding-left:12px;color:var(--muted);font-size:12px;justify-content:flex-start;gap:8px;}
   .budget-row.sub .amt{color:var(--muted);}
+  .budget-item-label{flex:1;min-width:0;outline:none;}
+  .budget-item-amt{display:flex;align-items:center;gap:3px;flex:0 0 auto;}
+  .budget-amt-input{
+    width:82px;text-align:right;border:1px solid var(--border);background:var(--bg);border-radius:6px;
+    padding:4px 6px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink);
+  }
+  .budget-amt-input:focus{outline:2px solid var(--teal);outline-offset:1px;}
+  .budget-row.sub .delete-btn{width:20px;height:20px;flex:0 0 auto;}
+  .budget-row.sub .delete-btn svg{width:11px;height:11px;}
+  .budget-add-row{margin-top:6px;}
   .budget-total{display:flex;justify-content:space-between;align-items:center;margin-top:6px;padding-top:14px;border-top:1.5px dashed var(--border);}
   .budget-total .label{font-family:'Fraunces',serif;font-size:15px;font-weight:600;}
   .budget-total .amt{font-family:'IBM Plex Mono',monospace;font-size:17px;color:var(--amber);font-weight:500;}
@@ -303,27 +313,8 @@
         <div class="stat"><div class="l">Dự trù</div><div class="v" id="statEstimate">—</div></div>
         <div class="stat spent"><div class="l">Đã chi thực tế</div><div class="v" id="statActual">0đ</div></div>
       </div>
-      <div class="budget-card">
-        <div class="budget-row"><span>Đi lại</span><span class="amt">7.114.000đ</span></div>
-        <div class="budget-row sub"><span>Vé máy bay HAN–DAD</span><span class="amt">2.514.000đ</span></div>
-        <div class="budget-row sub"><span>Vé máy bay DAD–HAN</span><span class="amt">2.600.000đ</span></div>
-        <div class="budget-row sub"><span>Thuê xe VF3 (đã cọc 200k)</span><span class="amt">2.000.000đ</span></div>
-
-        <div class="budget-row" style="margin-top:6px;"><span>Khách sạn</span><span class="amt">1.860.000đ + ?</span></div>
-        <div class="budget-row sub"><span>88 ngày là tới HOUSE · 29/7</span><span class="amt">300.000đ</span></div>
-        <div class="budget-row sub"><span>Langmandi Chapter · 30–31/7</span><span class="amt">910.000đ</span></div>
-        <div class="budget-row sub"><span>Ri's House · 1/8 (đã cọc 200k)</span><span class="amt">650.000đ</span></div>
-        <div class="budget-row sub"><span>Ngói's House · 2/8</span><span class="amt">Chưa có giá</span></div>
-
-        <div class="budget-row" style="margin-top:6px;"><span>Ăn uống (ước tính)</span><span class="amt">8.974.000đ</span></div>
-
-        <div class="budget-total"><span class="label">Tổng dự trù</span><span class="amt" id="totalEstimate">17.948.000đ + ?</span></div>
-        <div class="budget-note">Ăn uống + các vé lẻ là ước tính ban đầu. Ô "Đã chi thực tế" ở trên cộng từ số tiền bạn nhập tay ở từng mục trong Lịch trình / Ăn uống / Muốn đi.</div>
-      </div>
-      <div class="flag">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/></svg>
-        <span>Ngói's House đêm 2/8 chưa có giá phòng — cần bổ sung để tính đúng tổng dự trù.</span>
-      </div>
+      <div class="budget-card" id="budgetCard"></div>
+      <div class="budget-note">Chạm vào tên hoặc số tiền để sửa; để trống nghĩa là chưa có giá. Ô "Đã chi thực tế" ở trên cộng từ số tiền bạn nhập tay ở từng mục trong Lịch trình / Ăn uống / Muốn đi.</div>
     </section>
 
     </div>
@@ -464,6 +455,23 @@ const wishDaNang = [
   {id:'wd-4', name:'Kala Kala', note:'Ok hơn Esco — cả 2 nên đi buổi chiều ngắm hoàng hôn'},
 ];
 
+const budgetCategories = [
+  { id:'travel', label:'Đi lại', items:[
+    {id:'bg-flight1', label:'Vé máy bay HAN–DAD', amount:2514000},
+    {id:'bg-flight2', label:'Vé máy bay DAD–HAN', amount:2600000},
+    {id:'bg-car', label:'Thuê xe VF3 (đã cọc 200k)', amount:2000000},
+  ]},
+  { id:'hotel', label:'Khách sạn', items:[
+    {id:'bg-h1', label:'88 ngày là tới HOUSE · 29/7', amount:300000},
+    {id:'bg-h2', label:'Langmandi Chapter · 30–31/7', amount:910000},
+    {id:'bg-h3', label:"Ri's House · 1/8 (đã cọc 200k)", amount:650000},
+    {id:'bg-h4', label:"Ngói's House · 2/8", amount:0},
+  ]},
+  { id:'food', label:'Ăn uống (ước tính)', items:[
+    {id:'bg-food1', label:'Ước tính chung cho cả chuyến', amount:8974000},
+  ]},
+];
+
 // ---------- persistence ----------
 let state = { visited:{}, actual:{}, text:{}, removed:{}, custom:{} };
 let storageOK = true;
@@ -516,7 +524,7 @@ function deleteBtn(id, section){
   return `<button class="delete-btn" data-delete="${id}" data-section="${section}" aria-label="Xoá mục">${trashSVG()}</button>`;
 }
 function addBtn(section, kind, dayIdx){
-  const label = kind==='event' ? '+ Thêm mục' : '+ Thêm địa điểm';
+  const label = kind==='event' ? '+ Thêm mục' : kind==='budgetitem' ? '+ Thêm khoản' : '+ Thêm địa điểm';
   const dayAttr = dayIdx!==undefined ? ` data-day-idx="${dayIdx}"` : '';
   return `<button class="add-btn" data-add="${section}" data-add-kind="${kind}"${dayAttr}>${label}</button>`;
 }
@@ -624,6 +632,57 @@ function renderGroup(elId, staticArr, section, city){
   bindDynamic(el);
 }
 
+function budgetAmount(id, fallback){
+  const raw = state.text[id+'-amount'];
+  return raw!==undefined ? toNumber(raw) : (fallback||0);
+}
+
+function budgetItemRow(item, section){
+  const amt = budgetAmount(item.id, item.amount);
+  return `
+    <div class="budget-row sub">
+      <span class="budget-item-label" contenteditable="true" data-text="${item.id}-label">${applyTextOverride(item.id+'-label', item.label)}</span>
+      <span class="budget-item-amt">
+        <input type="text" inputmode="numeric" class="budget-amt-input" placeholder="0" value="${amt||''}" data-budgetamt="${item.id}">
+        <span class="unit">đ</span>
+      </span>
+      ${deleteBtn(item.id, section)}
+    </div>`;
+}
+
+function budgetCategoryList(cat){
+  return cat.items.filter(i=>!state.removed[i.id]).concat(state.custom['budget-'+cat.id]||[]);
+}
+
+function renderBudget(){
+  const el = document.getElementById('budgetCard');
+  const html = budgetCategories.map(cat=>{
+    const list = budgetCategoryList(cat);
+    return `
+      <div class="budget-row" style="margin-top:6px;"><span>${cat.label}</span><span class="amt" id="cat-${cat.id}-subtotal">0đ</span></div>
+      ${list.map(i=>budgetItemRow(i, 'budget-'+cat.id)).join('')}
+      <div class="budget-add-row">${addBtn('budget-'+cat.id, 'budgetitem')}</div>
+    `;
+  }).join('');
+  el.innerHTML = html + `<div class="budget-total"><span class="label">Tổng dự trù</span><span class="amt" id="totalEstimate">0đ</span></div>`;
+  bindDynamic(el);
+  updateBudgetTotals();
+}
+
+function updateBudgetTotals(){
+  let grand = 0;
+  budgetCategories.forEach(cat=>{
+    const subtotal = budgetCategoryList(cat).reduce((sum,i)=>sum+budgetAmount(i.id, i.amount), 0);
+    grand += subtotal;
+    const subEl = document.getElementById(`cat-${cat.id}-subtotal`);
+    if(subEl) subEl.textContent = fmt(subtotal);
+  });
+  const totalEl = document.getElementById('totalEstimate');
+  if(totalEl) totalEl.textContent = fmt(grand);
+  const statEl = document.getElementById('statEstimate');
+  if(statEl) statEl.textContent = fmt(grand);
+}
+
 function renderAllGroups(){
   renderGroup('foodHoiAn', foodHoiAn, 'food-hoian', 'Hội An');
   renderGroup('foodDaNang', foodDaNang, 'food-danang', 'Đà Nẵng');
@@ -637,6 +696,7 @@ function rerenderSection(section){
   else if(section==='food-danang') renderGroup('foodDaNang', foodDaNang, section, 'Đà Nẵng');
   else if(section==='wish-hoian') renderGroup('wishHoiAn', wishHoiAn, section, 'Hội An');
   else if(section==='wish-danang') renderGroup('wishDaNang', wishDaNang, section, 'Đà Nẵng');
+  else if(section.startsWith('budget-')) renderBudget();
 }
 
 function bindDynamic(root){
@@ -667,6 +727,13 @@ function bindDynamic(root){
     el.oninput = ()=>{
       state.actual[el.dataset.spend] = el.value;
       updateBudgetStats();
+      saveState();
+    };
+  });
+  root.querySelectorAll('[data-budgetamt]').forEach(el=>{
+    el.oninput = ()=>{
+      state.text[el.dataset.budgetamt+'-amount'] = el.value;
+      updateBudgetTotals();
       saveState();
     };
   });
@@ -701,13 +768,15 @@ function bindDynamic(root){
       const id = newId();
       if(kind==='event'){
         state.custom[section].push({id, time:'--:--', title:'Điểm mới — chạm để sửa', note:'Chạm để thêm ghi chú'});
+      } else if(kind==='budgetitem'){
+        state.custom[section].push({id, label:'Khoản mới — chạm để sửa', amount:0});
       } else {
         state.custom[section].push({id, name:'Địa điểm mới — chạm để sửa', note:'Chạm để thêm ghi chú (địa chỉ, giờ, giá...)'});
       }
       saveState();
       rerenderSection(section);
       setTimeout(()=>{
-        const target = document.querySelector(`[data-text="${id}-title"]`);
+        const target = document.querySelector(`[data-text="${id}-title"]`) || document.querySelector(`[data-text="${id}-label"]`);
         if(target){
           target.focus();
           const range = document.createRange();
@@ -724,7 +793,6 @@ function bindDynamic(root){
 function updateBudgetStats(){
   const total = Object.values(state.actual).reduce((sum,v)=>sum+toNumber(v),0);
   document.getElementById('statActual').textContent = fmt(total);
-  document.getElementById('statEstimate').textContent = '17.948.000đ';
 }
 
 async function init(){
@@ -732,6 +800,7 @@ async function init(){
   renderChips();
   renderDay(0);
   renderAllGroups();
+  renderBudget();
   updateBudgetStats();
   if(typeof Storage === 'undefined'){
     document.getElementById('saveNoteText').textContent = 'Trình duyệt này không hỗ trợ lưu trữ — chỉnh sửa sẽ không được giữ lại.';
