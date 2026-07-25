@@ -140,12 +140,6 @@
 
   .spend-row{display:flex;align-items:center;gap:6px;margin-top:8px;}
   .spend-row label{font-size:11px;color:var(--muted);flex:0 0 auto;}
-  .spend-row input{
-    flex:1;min-width:0;border:1px solid var(--border);background:var(--bg);border-radius:8px;
-    padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ink);
-  }
-  .spend-row input:focus{outline:2px solid var(--teal);outline-offset:1px;}
-  .spend-row span.unit{font-size:11px;color:var(--muted);}
 
   .flag{display:flex;gap:7px;margin-top:8px;padding:8px 10px;background:var(--coral-soft);border-radius:9px;font-size:11.5px;color:#9C5A46;line-height:1.4;}
   .flag svg{flex:0 0 auto;margin-top:1px;stroke:#B5654F;}
@@ -235,7 +229,7 @@
     <div class="trip-sub">Nguyễn Hữu Hoàng Phong &amp; Phạm Hồng Nhung · 29/7 → 3/8</div>
     <div class="save-note" id="saveNote">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-      <span id="saveNoteText">Chạm ô vuông để đánh dấu đã đi, sửa trực tiếp vào chữ, nhập số tiền đã chi — tự lưu lại.</span>
+      <span id="saveNoteText">Chạm ô vuông để đánh dấu đã đi, sửa trực tiếp vào chữ — tự lưu lại. Tiền chi tiêu thực tế nhập ở tab Ngân sách.</span>
     </div>
   </header>
 
@@ -313,7 +307,7 @@
         <div class="stat spent" style="flex:1;"><div class="l">Đã chi thực tế</div><div class="v" id="statActual">0đ</div></div>
       </div>
       <div class="budget-card" id="budgetCard"></div>
-      <div class="budget-note">Đi lại và Khách sạn là chi phí đã đặt/đã trả, sửa số tiền trực tiếp ở đây. Ăn uống không tính trước — chi bao nhiêu thì vào tab Ăn uống nhập vào ô "Đã chi" ở từng quán, số đó tự cộng vào "Đã chi thực tế" ở đây.</div>
+      <div class="budget-note">Đây là nơi duy nhất ghi tiền đã chi thực tế — chia theo Đi lại, Khách sạn và từng ngày. Chạm vào tên hoặc số tiền để sửa, bấm "+ Thêm khoản" để thêm chi tiêu phát sinh trong ngày đó.</div>
     </section>
 
     </div>
@@ -454,6 +448,11 @@ const wishDaNang = [
   {id:'wd-4', name:'Kala Kala', note:'Ok hơn Esco — cả 2 nên đi buổi chiều ngắm hoàng hôn'},
 ];
 
+function dayBudgetItems(dayKey){
+  const day = days.find(d=>d.key===dayKey);
+  return day.events.filter(e=>e.cost).map(e=>({id:'bg-'+e.id, label: e.title, amount: toNumber(e.cost)}));
+}
+
 const budgetCategories = [
   { id:'travel', label:'Đi lại', items:[
     {id:'bg-flight1', label:'Vé máy bay HAN–DAD', amount:2514000},
@@ -466,6 +465,7 @@ const budgetCategories = [
     {id:'bg-h3', label:"Ri's House · 1/8 (đã cọc 200k)", amount:650000},
     {id:'bg-h4', label:"Ngói's House · 2/8", amount:0},
   ]},
+  ...days.map(d=>({ id:'day-'+d.key, label:`${d.label} · ${d.date.split(' · ')[0]}`, items: dayBudgetItems(d.key) })),
 ];
 
 // ---------- persistence ----------
@@ -492,7 +492,7 @@ function saveState(){
       storageOK=false;
       text.textContent='Không lưu được trên thiết bị này.';
     }
-    setTimeout(()=>{note.classList.remove('saving'); if(storageOK) text.textContent='Chạm ô vuông để đánh dấu đã đi, sửa trực tiếp vào chữ, nhập số tiền đã chi — tự lưu lại.';},1400);
+    setTimeout(()=>{note.classList.remove('saving'); if(storageOK) text.textContent='Chạm ô vuông để đánh dấu đã đi, sửa trực tiếp vào chữ — tự lưu lại. Tiền chi tiêu thực tế nhập ở tab Ngân sách.';},1400);
   },350);
 }
 
@@ -526,15 +526,12 @@ function addBtn(section, kind, dayIdx){
 }
 function newId(){ return 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 
-function spendControls(id){
+function visitedRow(id){
   const visited = !!state.visited[id];
-  const actual = state.actual[id] || '';
   return `
     <div class="spend-row">
       <div class="check ${visited?'on':''}" data-toggle="${id}">${checkSVG()}</div>
-      <label>Đã chi:</label>
-      <input type="text" inputmode="numeric" placeholder="0" value="${actual}" data-spend="${id}">
-      <span class="unit">đ</span>
+      <label>Đã đi</label>
     </div>`;
 }
 
@@ -592,7 +589,7 @@ function eventCardHTML(ev, section){
           </div>
           ${deleteBtn(ev.id, section)}
         </div>
-        ${spendControls(ev.id)}
+        ${visitedRow(ev.id)}
       </div>
     </div>`;
 }
@@ -617,7 +614,7 @@ function foodCard(item, city, section){
       </div>
     </div>
     ${mapRow(item.id, query)}
-    ${spendControls(item.id)}
+    ${visitedRow(item.id)}
   </div>`;
 }
 
@@ -666,20 +663,17 @@ function renderBudget(){
 }
 
 function updateBudgetStats(){
-  let actualFromBudget = 0;
+  let total = 0;
   budgetCategories.forEach(cat=>{
     const subtotal = budgetCategoryList(cat).reduce((sum,i)=>sum+budgetAmount(i.id, i.amount), 0);
-    actualFromBudget += subtotal;
+    total += subtotal;
     const subEl = document.getElementById(`cat-${cat.id}-subtotal`);
     if(subEl) subEl.textContent = fmt(subtotal);
   });
-  const manualActual = Object.values(state.actual).reduce((sum,v)=>sum+toNumber(v),0);
-  const totalActual = actualFromBudget + manualActual;
-
   const statActualEl = document.getElementById('statActual');
-  if(statActualEl) statActualEl.textContent = fmt(totalActual);
+  if(statActualEl) statActualEl.textContent = fmt(total);
   const totalEl = document.getElementById('totalEstimate');
-  if(totalEl) totalEl.textContent = fmt(totalActual);
+  if(totalEl) totalEl.textContent = fmt(total);
 }
 
 function renderAllGroups(){
@@ -720,13 +714,6 @@ function bindDynamic(root){
       const q = field ? field.innerText.trim() : '';
       if(!q) { field?.focus(); return; }
       window.open('https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q), '_blank', 'noopener');
-    };
-  });
-  root.querySelectorAll('[data-spend]').forEach(el=>{
-    el.oninput = ()=>{
-      state.actual[el.dataset.spend] = el.value;
-      updateBudgetStats();
-      saveState();
     };
   });
   root.querySelectorAll('[data-budgetamt]').forEach(el=>{
